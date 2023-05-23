@@ -1,0 +1,23 @@
+Title,Books,Cinema,Cooking,Sports,Gaming
+"The best books to read in your free time", 0.2, 0.1, 0.3, 0.2, 0.2
+"The latest movies you should watch", 0.1, 0.3, 0.2, 0.1, 0.3
+"What's your favorite dish to cook?", 0.3, 0.2, 0.1, 0.3, 0.1
+"The most exciting sports events of the year", 0.4, 0.1, 0.2, 0.1, 0.2
+"What are the best games to play right now?", 0.2, 0.4, 0.1, 0.2, 0.1
+"Top 10 travel destinations for 2023", 0.3, 0.2, 0.3, 0.1, 0.1
+"10 must-try recipes for the summer", 0.4,0.1, 0.4, 0.1, 0
+"5 ways to stay healthy and fit during the winter", 0.2, 0.1, 0.1, 0.5, 0.1
+"10 tips for improving your productivity at work", 0.2 , 0.1 , 0 , 0.6 , 0.1 
+"The most popular video games of all time", 0 , 0 , 0 , 0 , 1
+“The best movies to watch with your family”, 0.1, 0.2, 0.4, 0.1, 0.2
+“The most popular sports in the world”, 0.2, 0.1, 0.1, 0.4, 0.2
+“The best books to read before you die”, 0.3, 0.3, 0.2, 0.1, 0.1
+“The most anticipated video games of the year”, 0.1, 0.1, 0.2, 0.2, 0.4
+“The best cooking recipes for beginners”, 0.4, 0.2, 0.1, 0.1, 0.2
+“The best sports documentaries of all time”, 0.1, 0.1, 0.4, 0.3, 0.1
+“The most popular books of the year”, 0.2, 0.4, 0.1, 0.1, 0.2
+“The best cooking channels on YouTube”, 0.3, 0.1, 0.2, 0.1, 0.3
+“The most anticipated movies of the year”, 0.1, 0.2, 0.4, 0.1, 0.2
+“The best video games for kids”, 0.2, 0.1, 0.2, 0.3, 0.2
+“The top 10 books that will change your life”, 0.2, 0.4, 0.1, 0.1, 0.2
+“The best movies to watch when you’re feeling happy”, 0.1, 0.2, 0.4, 0.1, 0.2
