@@ -27,11 +27,11 @@ class ListContentAdapter(val listContent: ArrayList<DetailContent>) : RecyclerVi
         holder.title.text = title
         holder.deskripsi.text = deskripsi
 
-//        holder.itemView.setOnClickListener {
-//            val intentDetail = Intent(holder.itemView.context, DetailActivity::class.java)
+        holder.itemView.setOnClickListener {
+            val intentDetail = Intent(holder.itemView.context, DetailContentActivity::class.java)
 //            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
-//            holder.itemView.context.startActivity(intentDetail)
-//        }
+            holder.itemView.context.startActivity(intentDetail)
+        }
     }
 
     override fun getItemCount(): Int = listContent.size

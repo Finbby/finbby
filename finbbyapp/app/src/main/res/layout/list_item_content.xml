@@ -27,16 +27,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/img_content"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="5.5dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/img_login"
                 card_view:layout_constraintBottom_toBottomOf="parent"
                 card_view:layout_constraintStart_toStartOf="parent"
                 card_view:layout_constraintTop_toTopOf="@+id/title_content"
-                card_view:layout_constraintVertical_bias="0.0" />
+                card_view:layout_constraintVertical_bias="1.0" />
 
             <TextView
                 android:id="@+id/title_content"
