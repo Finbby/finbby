@@ -16,6 +16,11 @@
         android:name="com.example.finbbyapp.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
+    <fragment
+        android:id="@+id/navigation_add_content"
+        android:name="com.example.finbbyapp.ui.AddContent1Fragment"
+        android:label="Add Content"
+        tools:layout="@layout/fragment_add_content1" />
 
     <fragment
         android:id="@+id/navigation_notifications"

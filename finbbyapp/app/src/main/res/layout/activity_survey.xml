@@ -20,17 +20,33 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/edt_email"
+        android:id="@+id/edt_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/background_edt"
-        android:hint="Email"
+        android:hint="search topic"
+        android:layout_marginTop="40dp"
         android:padding="15dp"
         android:textColor="@color/white"
+        android:inputType="text"
+        android:textCursorDrawable="@drawable/color_cursor"
         android:textColorHint="@color/white"
         android:layout_marginHorizontal="15dp"
-        android:drawableRight=""
+        android:drawableRight="@drawable/ic_search"
+        android:lines="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_qsurvey"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="27dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edt_search" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
