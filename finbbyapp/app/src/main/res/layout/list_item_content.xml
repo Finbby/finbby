@@ -48,6 +48,7 @@
                 android:layout_marginTop="8dp"
                 android:textColor="@color/black"
                 android:text="Alammm"
+                android:autoLink="web"
                 android:textStyle="bold"
                 card_view:layout_constraintStart_toEndOf="@+id/img_content"
                 card_view:layout_constraintTop_toTopOf="parent" />

@@ -2,11 +2,13 @@ package com.example.finbbyapp.ui
 
 import com.example.finbbyapp.R
 import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 
 class ListContentAdapter(val listContent: ArrayList<DetailContent>) : RecyclerView.Adapter<ListContentAdapter.ListViewHolder>() {
@@ -27,10 +29,15 @@ class ListContentAdapter(val listContent: ArrayList<DetailContent>) : RecyclerVi
         holder.title.text = title
         holder.deskripsi.text = deskripsi
 
-        holder.itemView.setOnClickListener {
-            val intentDetail = Intent(holder.itemView.context, AddContent1Fragment::class.java)
-//            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
-            holder.itemView.context.startActivity(intentDetail)
+//        holder.itemView.setOnClickListener {
+//            val intentDetail = Intent(holder.itemView.context, DetailContentActivity::class.java)
+////            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
+//            holder.itemView.context.startActivity(intentDetail)
+//        }
+
+        holder.title.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("myapp://chat"))
+            holder.itemView.context.startActivity(intent)
         }
     }
 
