@@ -8,6 +8,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -19,6 +20,7 @@ import com.example.finbbyapp.ui.AddContent1Fragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private var nav: Number = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_add_content ,R.id.navigation_notifications
+                R.id.navigation_home, R.id.navigation_forum, R.id.navigation_dashboard, R.id.navigation_add_content ,R.id.navigation_notifications
             )
         )
         var fragment = AddContent1Fragment()
@@ -40,31 +42,55 @@ class MainActivity : AppCompatActivity() {
         if(currentFragment !is AddContent1Fragment) {
             getSupportActionBar()?.title="tes"
         }
+        val onDestinationChangedListener = NavController.OnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.navigation_forum -> {
+                    nav = 1
+                    // Mengatur option menu untuk Fragment 1
+                    // Panggil invalidateOptionsMenu() untuk memperbarui menu
+                    invalidateOptionsMenu()
+                }
+                R.id.navigation_home -> {
+                    nav = 0
+                    // Mengatur option menu untuk Fragment 2
+                    invalidateOptionsMenu()
+                }
+                // Tambahkan tujuan Fragment lainnya
+            }
+        }
+
+        navController.addOnDestinationChangedListener(onDestinationChangedListener)
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.search_menu, menu)
+        if(nav == 0) {
+            inflater.inflate(R.menu.search_menu, menu)
 
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu.findItem(R.id.search).actionView as SearchView
+            val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+            val searchView = menu.findItem(R.id.search).actionView as SearchView
 
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-        searchView.queryHint = "search content..."
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+            searchView.queryHint = "search content..."
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
-            override fun onQueryTextSubmit(query: String): Boolean {
+                override fun onQueryTextSubmit(query: String): Boolean {
 //                mainViewModel.findUser(query)
-                searchView.clearFocus()
-                return true
-            }
+                    searchView.clearFocus()
+                    return true
+                }
 
-            override fun onQueryTextChange(newText: String): Boolean {
-                return false
-            }
-        })
+                override fun onQueryTextChange(newText: String): Boolean {
+                    return false
+                }
+            })
+        } else if(nav == 1) {
+            inflater.inflate(R.menu.forum_menu, menu)
+        }
+
         return true
     }
 

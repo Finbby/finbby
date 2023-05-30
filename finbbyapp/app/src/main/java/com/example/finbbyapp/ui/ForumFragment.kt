@@ -1,10 +1,11 @@
 package com.example.finbbyapp.ui
 
 import android.os.Bundle
+import android.view.*
+import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finbbyapp.R
 import com.example.finbbyapp.databinding.FragmentForumBinding
@@ -23,7 +24,36 @@ class ForumFragment : Fragment() {
         val root: View = binding.root
         rvForum = binding.rvForum
 
+        val activity = requireActivity() as AppCompatActivity
+        activity.supportActionBar?.title = "My Forum"
+
+        showRecyclerList()
+
         return root
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear() // Menghapus semua item menu yang ada
+
+        when (val activity = requireActivity()) {
+            is AppCompatActivity -> {
+                activity.menuInflater.inflate(R.menu.forum_menu, menu) // Inflate menu untuk Fragment 1
+            }
+        }
+
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun showRecyclerList() {
+        val listForum = arrayListOf(DetailForum("Tutor 1", R.drawable.img_login, "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs "),
+            DetailForum("Tutor 1", R.drawable.img_login, "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs "),
+            DetailForum("Tutor 1", R.drawable.img_login, "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs "),
+            DetailForum("Tutor 1", R.drawable.img_login, "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs "),
+            DetailForum("Tutor 1", R.drawable.img_login, "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs "),
+            DetailForum("Tutor 1", R.drawable.img_login, "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs "))
+
+        rvForum.layoutManager = LinearLayoutManager(requireContext())
+        val listForumAdapter = ListForumAdapter(listForum)
+        rvForum.adapter = listForumAdapter
+    }
 }
