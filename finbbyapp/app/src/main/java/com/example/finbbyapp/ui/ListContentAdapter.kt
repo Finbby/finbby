@@ -29,11 +29,11 @@ class ListContentAdapter(val listContent: ArrayList<DetailContent>) : RecyclerVi
         holder.title.text = title
         holder.deskripsi.text = deskripsi
 
-//        holder.itemView.setOnClickListener {
-//            val intentDetail = Intent(holder.itemView.context, DetailContentActivity::class.java)
-////            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
-//            holder.itemView.context.startActivity(intentDetail)
-//        }
+        holder.itemView.setOnClickListener {
+            val intentDetail = Intent(holder.itemView.context, ChatActivity::class.java)
+//            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
+            holder.itemView.context.startActivity(intentDetail)
+        }
 
         holder.title.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("myapp://chat"))
