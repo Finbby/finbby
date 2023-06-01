@@ -29,11 +29,12 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="18dp"
-            android:text="Title titlw dd"
+            android:fontFamily="@font/poppin"
+            android:text="Tutor 1"
             android:textColor="#555"
-            android:textSize="19dp"
+            android:textSize="18dp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/img_content"
             app:layout_constraintTop_toTopOf="parent" />
@@ -42,10 +43,11 @@
             android:id="@+id/author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="By: Yudha"
+            android:text="By: Anton"
+            android:fontFamily="@font/poppin"
             android:textColor="@color/black"
             android:textSize="15dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="0dp"
             app:layout_constraintStart_toStartOf="@+id/title"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
@@ -54,8 +56,8 @@
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:layout_marginHorizontal="30dp"
-            android:layout_marginTop="29dp"
-            android:src="@drawable/img_login"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/c"
             app:layout_constraintTop_toBottomOf="@id/author"
             tools:layout_editor_absoluteX="30dp" />
 
@@ -63,12 +65,12 @@
             android:id="@+id/deskripsi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="kkjw ws kkshsk hsshjlskwjs lkqsjlksj sqjskljs sjskwjsqk sjkslk sjwqsjsks slkjsskq sjslks lksjskljsk jslksks slkjslkjs sjksj ksljslkj sl"
+            android:text="Borem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tempus urna at turpis condimentum lobortis. Ut commodo efficitur neque. Ut diam quam, semper iaculis condimentum ac, vestibulum eu nisl."
             app:layout_constraintTop_toBottomOf="@+id/imageView"
             android:layout_marginHorizontal="30dp"
             android:justificationMode="inter_word"
-            android:fontFamily="sans-serif"
+            android:fontFamily="@font/poppin"
             android:textColor="@color/black"
-            android:layout_marginTop="25dp"/>
+            android:layout_marginTop="15dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

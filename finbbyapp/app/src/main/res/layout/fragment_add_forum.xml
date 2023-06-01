@@ -54,6 +54,7 @@
         android:layout_marginStart="35dp"
         android:layout_marginTop="52dp"
         android:text="Topics"
+        android:fontFamily="@font/poppin"
         android:textColor="@color/black"
         android:textSize="18dp"
         app:layout_constraintStart_toStartOf="parent"

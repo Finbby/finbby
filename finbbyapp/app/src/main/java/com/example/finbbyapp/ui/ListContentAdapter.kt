@@ -30,7 +30,7 @@ class ListContentAdapter(val listContent: ArrayList<DetailContent>) : RecyclerVi
         holder.deskripsi.text = deskripsi
 
         holder.itemView.setOnClickListener {
-            val intentDetail = Intent(holder.itemView.context, ChatActivity::class.java)
+            val intentDetail = Intent(holder.itemView.context, DetailContentActivity::class.java)
 //            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
             holder.itemView.context.startActivity(intentDetail)
         }

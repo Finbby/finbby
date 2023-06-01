@@ -1,5 +1,6 @@
 package com.example.finbbyapp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -24,12 +25,14 @@ class AddContent1Fragment : Fragment() {
         _binding = FragmentAddContent1Binding.inflate(inflater, container, false)
         val root: View = binding.root
         rvQSurvey = binding.rvTopics
-
-        val activity = requireActivity() as AppCompatActivity
-        activity.supportActionBar?.title = "tes"
         setHasOptionsMenu(true)
 
         showRecyclerList()
+
+        binding.next.setOnClickListener {
+            val intent = Intent(requireActivity(), AddContent2Activity::class.java)
+            startActivity(intent)
+        }
 
         return root
     }
@@ -45,5 +48,15 @@ class AddContent1Fragment : Fragment() {
         rvQSurvey.layoutManager = GridLayoutManager(requireContext(), 3)
         val listContentAdapter = ListQSurveyAdapter(listQSurvey)
         rvQSurvey.adapter = listContentAdapter
+    }
+
+    fun replaceFragment() {
+        val categoryFragment = AddContent2Fragment()
+        val fragmentManager = parentFragmentManager
+        fragmentManager.beginTransaction().apply {
+            replace(R.id.tes1, categoryFragment, AddContent2Fragment::class.java.simpleName)
+            addToBackStack(null)
+            commit()
+        }
     }
 }
