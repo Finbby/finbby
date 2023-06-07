@@ -11,21 +11,19 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 
-class ListContentAdapter(val listContent: ArrayList<DetailContent>) : RecyclerView.Adapter<ListContentAdapter.ListViewHolder>() {
+class ListCMakerAdapter(val listContent: ArrayList<DetailContent>) : RecyclerView.Adapter<ListCMakerAdapter.ListViewHolder>() {
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imgPhoto: ImageView = itemView.findViewById(R.id.img_content)
         val title: TextView = itemView.findViewById(R.id.title_content)
         val deskripsi: TextView = itemView.findViewById(R.id.deskripsi_content)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
-        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.list_item_content, parent, false)
+        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.item_content_maker, parent, false)
         return ListViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
         val (title, deskripsi, photo) = listContent[position]
-        holder.imgPhoto.setImageResource(photo)
         holder.title.text = title
         holder.deskripsi.text = deskripsi
 
@@ -35,10 +33,10 @@ class ListContentAdapter(val listContent: ArrayList<DetailContent>) : RecyclerVi
             holder.itemView.context.startActivity(intentDetail)
         }
 
-//        holder.title.setOnClickListener {
-//            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("myapp://chat"))
-//            holder.itemView.context.startActivity(intent)
-//        }
+        holder.title.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("myapp://chat"))
+            holder.itemView.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int = listContent.size

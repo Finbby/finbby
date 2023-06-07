@@ -2,6 +2,7 @@ package com.example.finbbyapp
 
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finbbyapp.databinding.ActivityMainBinding
 import com.example.finbbyapp.ui.AddContent1Fragment
+import com.example.finbbyapp.ui.JoinForumActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -34,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_forum, R.id.navigation_add_content
+                R.id.navigation_home, R.id.navigation_forum, R.id.navigation_add_content, R.id.navigation_profile
             )
         )
         var fragment = AddContent1Fragment()
@@ -46,16 +48,16 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.navigation_forum -> {
                     nav = 1
-                    // Mengatur option menu untuk Fragment 1
-                    // Panggil invalidateOptionsMenu() untuk memperbarui menu
                     invalidateOptionsMenu()
                 }
                 R.id.navigation_home -> {
                     nav = 0
-                    // Mengatur option menu untuk Fragment 2
                     invalidateOptionsMenu()
                 }
-                // Tambahkan tujuan Fragment lainnya
+              R.id.navigation_add_content -> {
+                  nav = -1
+                  invalidateOptionsMenu()
+              }
             }
         }
 
@@ -89,6 +91,25 @@ class MainActivity : AppCompatActivity() {
             })
         } else if(nav == 1) {
             inflater.inflate(R.menu.forum_menu, menu)
+            val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+            val searchView = menu.findItem(R.id.search).actionView as SearchView
+
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+            searchView.queryHint = "search forum..."
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    val intent = Intent(this@MainActivity, JoinForumActivity::class.java)
+                    startActivity(intent)
+//                mainViewModel.findUser(query)
+                    searchView.clearFocus()
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    return false
+                }
+            })
         }
 
         return true

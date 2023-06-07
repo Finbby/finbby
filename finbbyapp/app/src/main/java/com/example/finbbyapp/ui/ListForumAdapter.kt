@@ -1,5 +1,6 @@
 package com.example.finbbyapp.ui
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,11 +27,11 @@ class ListForumAdapter(val listForum: ArrayList<DetailForum>) : RecyclerView.Ada
         holder.name.text = name
         holder.description.text = description
 
-//        holder.itemView.setOnClickListener {
-//            val intentDetail = Intent(holder.itemView.context, DetailContentActivity::class.java)
-////            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
-//            holder.itemView.context.startActivity(intentDetail)
-//        }
+        holder.itemView.setOnClickListener {
+            val intentDetail = Intent(holder.itemView.context, ChatActivity::class.java)
+//            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
+            holder.itemView.context.startActivity(intentDetail)
+        }
 
 //        holder.title.setOnClickListener {
 //            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("myapp://chat"))

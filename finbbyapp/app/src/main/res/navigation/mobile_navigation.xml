@@ -20,5 +20,10 @@
         android:name="com.example.finbbyapp.ui.AddContent1Fragment"
         android:label="Add Content"
         tools:layout="@layout/fragment_add_content1" />
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.finbbyapp.ui.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
 
 </navigation>

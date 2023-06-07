@@ -28,6 +28,8 @@ class HomeFragment : Fragment() {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        val activity = requireActivity() as AppCompatActivity
+        activity.supportActionBar?.show()
 
         rvContent = binding.rvContent
         showRecyclerList()
@@ -35,12 +37,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun showRecyclerList() {
-        val listContent = arrayListOf(DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs ", R.drawable.img_login),
-            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs ", R.drawable.img_login),
-            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs ", R.drawable.img_login),
-            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs ", R.drawable.img_login),
-            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs ", R.drawable.img_login),
-            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs ", R.drawable.img_login))
+        val listContent = arrayListOf(DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs jbhjbbbhb hj bh bhb jb bbhbhjbhjb  hj bhb hjbh hbhjbj", R.drawable.img_login),
+            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs jbhjbbbhb hj bh bhb jb bbhbhjbhjb  hj bhb hjbh hbhjbj", R.drawable.img_login),
+            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs jbhjbbbhb hj bh bhb jb bbhbhjbhjb  hj bhb hjbh hbhjbj", R.drawable.img_login),
+            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs jbhjbbbhb hj bh bhb jb bbhbhjbhjb  hj bhb hjbh hbhjbj", R.drawable.img_login),
+            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs jbhjbbbhb hj bh bhb jb bbhbhjbhjb  hj bhb hjbh hbhjbj", R.drawable.img_login),
+            DetailContent("Tutor 1", "jj jhws jhswjshsjshjs wshjs hjhsjd shdjs hsjsh shdjdj hdjsah hxjhs jbhjbbbhb hj bh bhb jb bbhbhjbhjb  hj bhb hjbh hbhjbj", R.drawable.img_login))
 
         rvContent.layoutManager = LinearLayoutManager(requireContext())
         val listContentAdapter = ListContentAdapter(listContent)
