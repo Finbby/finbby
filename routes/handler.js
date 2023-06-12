@@ -1,44 +1,19 @@
+const jwt = require("jsonwebtoken");
 const express = require("express")
 const bcrypt = require("bcrypt")
-const auth = require("../middleware/auth");
-const { admin, user } = require("../middleware/roles");
 const pool = require("../sql");
+const upload = require('../middleware/uploadMiddleware');
 
 const router = express.Router();
-
-//POST CREATE ADMIN DATA TO DB
-router.post("/token",  [auth, admin], async (req, res)=>{
-	try {
-		const hashedPassword = await bcrypt.hash(req.query.password, 10)
-		const data = {
-			email: req.query.email,
-			password: hashedPassword,
-			roles: req.query.roles,
-		}
-		const query1 = "INSERT INTO authtb (email, password, roles) VALUES (?, ?, ?)";
-		pool.query(query1, Object.values(data), (error)=>{
-				if (error){
-                    			res.status(409);
-					res.json({status: "Error", message : "Email already exists" });
-				} else {
-                    			res.status(201);
-					res.json({status: "Success", message : "User Created!" });
-				}
-		});
-  } catch(error) {
-        res.status(500);
-	res.json({ status: "Error"});  
-    }
-});
 
 //POST REGISTER DATA TO DB
 router.post("/register", async (req, res)=>{
 	try {
-		const hashedPassword = await bcrypt.hash(req.query.password, 10)
+		const hashedPassword = await bcrypt.hash(req.body.password, 10)
 		const created_at = new Date().toISOString();
 		const data = {
-			email: req.query.email,
-			username: req.query.username,
+			email: req.body.email,
+			username: req.body.username,
 			password: hashedPassword,
 			created_at: created_at
 		}
@@ -68,27 +43,39 @@ router.post("/login", async (req, res) => {
     } 
         const query1 = `SELECT * FROM usertb WHERE email = '${email}'`;
     try {
-            pool.query(query1, async(error, result)=>{
-                if (!result[0]) {  
-                    res.status(404);
-                    return res.json({status: "Error", message: "User Not found!"});
-                }
-                if(await bcrypt.compare(password , result[0].password)) {
-                    res.json({status: "Success", data : result[0]});
-                } else {
-                    res.status(401);
-                    res.json({status: "Error", message: "Incorrect Email or Password!"});
-                }
-            });
-        } catch {
-            res.status(500);
-            res.json({status: "Error"});
-        }
-});  
-
+        pool.query(query1, async(error, result)=>{
+        if (!result[0]) {  
+			res.status(404);
+			return res.json({status: "Error", message: "User Not found!"});
+		}
+		if(await bcrypt.compare(password , result[0].password)) {
+			const token = jwt.sign({ email: result[0].email, id_user: result[0].id_user, username: result[0].username }, 'capstone', { expiresIn: '20h' });
+        	res.json({ status: "Success", data: result[0], token: token });
+      		} else {
+        	res.status(401);
+        	res.json({ status: "Error", message: "Incorrect Email or Password!" });
+      	}
+    	});
+  	} catch {
+    	res.status(500);
+    	res.json({ status: "Error" });
+  }
+});
+const authenticateUser = (req, res, next) => {
+	try {
+	  const token = req.headers.authorization.split(" ")[1]; // Extract the token from the Authorization header
+	  const secretKey = 'capstone'; // Replace 'your_secret_key' with your actual secret key
+	  const decodedToken = jwt.verify(token, secretKey); // Verify the token
+  
+	  req.userData = { email: decodedToken.email, id_user: decodedToken.id_user, username: decodedToken.username }; // Attach the user data to the request object
+	  next(); // Call the next middleware
+	} catch (error) {
+	  res.status(401).json({ status: "Error", message: "Authentication failed" });
+	}
+  };
 
 //VALIDATE EMAIL
-router.post("/email", [auth, admin], async (req, res) => {
+router.post("/email", async (req, res) => {
 	const email = req.query.email
 	if (email == null || email == ''){
         res.status(400);
@@ -120,7 +107,7 @@ router.get("/users", async (req, res)=>{
 
 //GET USER DATA BY EMAIL
 router.get("/users/email", async (req, res)=>{
-	const email = req.query.email
+	const email = req.body.email
 	const query = `SELECT * FROM usertb WHERE email = '${email}'`;
 	pool.query(query, [req.params.email], (error, result)=>{
 		if (!result[0]) {
@@ -167,9 +154,9 @@ router.put("/users/changePassword", async (req, res)=>{
 router.post("/survey", async (req, res)=>{
 	try {
 		const data = {
-			survey: req.query.survey,
+			topic: req.query.topic,
 		}
-		const query1 = "INSERT INTO surveytb (survey) VALUES (?)";
+		const query1 = "INSERT INTO surveytb (topic) VALUES (?)";
 		pool.query(query1, Object.values(data), (error)=>{
 				if (error){
                     			res.status(400);
@@ -201,79 +188,41 @@ router.get("/survey/:id", async (req, res)=>{
             		res.status(404);
 			res.json({status: "Error", message: "ID Not found!"});
 		} else {
-			res.json({status: "Success", message : "ecommendation Topic", data: result[0]});
-		} 
-	});
-});
-
-//POST survey topic
-router.post("/topic", async (req, res)=>{
-	try {
-		const data = {
-			topic: req.query.topic,
-			id_user: req.query.id_user,
-		}
-		const query1 = "INSERT INTO topictb (topic, id_user) VALUES (?, ?)";
-		pool.query(query1, Object.values(data), (error)=>{
-				if (error){
-                    			res.status(400);
-					res.json({status: "Error", message : "Please fill correctly!"});
-				} else {
-                    			res.status(201);
-					res.json({status: "Success", message : "Topic Created!" });
-				}
-		});
-  } catch {
-        res.status(500);
-	res.json({ status: "Error" });  
-    }
-});
-
-//GET recommendation topic in survey
-router.get("/topic", async (req, res)=>{
-	const query = "SELECT * FROM topictb";
- 	pool.query(query, (error, result)=>{
-		res.json({status: "Success", message : "Topic Selected", data: result });
-	});
-});
-
-//GET topic BY ID
-router.get("/topic/:id", async (req, res)=>{
-	const query = "SELECT * FROM topictb WHERE id_topic = ?";
-	pool.query(query, [req.params.id], (error, result)=>{
-		if (!result[0]) {
-            		res.status(404);
-			res.json({status: "Error", message: "ID Not found!"});
-		} else {
-			res.json({status: "Success", message : "Topic Selected by Id", data: result[0]});
+			res.json({status: "Success", message : "recommendation Topic", data: result[0]});
 		} 
 	});
 });
 
 //POST CONTENT TO DB
-router.post("/posting", async (req, res)=>{
-	try {
-		const data = {
-			title: req.query.title,
-			description: req.query.description,
-			id_topic: req.query.id_topic,
-			content: req.query.content,
-			id_user: req.query.id_user
-		}
-		const query1 = "INSERT INTO postingtb (title, description, id_topic, content, id_user) VALUES (?, ?, ?, ?, ?)";
-		pool.query(query1, Object.values(data), (error)=>{
-				if (error){
-                    			res.status(400);
-					res.json({status: "Error", message : "Please fill correctly!"});
-				} else {
-                    			res.status(201);
-					res.json({status: "Success", message : "Content Created!", data:data});
-				}
-		});
-  } catch {
-        res.status(500);
-	res.json({ status: "Error"});  
+router.post("/posting/create", authenticateUser, async (req, res)=>{
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      res.status(400).json({ status: 'Error', message: 'Failed to upload file' });
+    } else {
+      try {
+        const data = {
+          title: req.body.title,
+          description: req.body.description,
+          topic: req.body.topic,
+          content: req.body.content,
+          image: req.file ? req.file.filename : null,
+          sender: req.userData.username,
+        };
+
+        const query =
+          'INSERT INTO postingtb (title, description, topic, content, image, sender) VALUES (?, ?, ?, ?, ?, ?)';
+        pool.query(query, Object.values(data), (error) => {
+          if (error) {
+            res.status(400).json({ status: 'Error', message: 'Please fill correctly!' });
+          } else {
+            res.status(201).json({ status: 'Success', message: 'Content Created!', data: data });
+          }
+        });
+      } catch {
+        res.status(500).json({ status: 'Error' });
+      }
     }
+  });
 });
 
 //GET ALL POSTING CONTENT 
@@ -297,29 +246,30 @@ router.get("/posting/:id", async (req, res)=>{
 	});
 });
 
-//POST FORUM TO DB
-router.post("/forum", async (req, res)=>{
+// POST FORUM TO DB
+router.post("/forum/create", authenticateUser, async (req, res) => {
 	try {
-		const data = {
-			forumname: req.query.forumname,
-			forumdesc: req.query.forumdesc,
-			share: req.query.share,
-			id_topic: req.query.id_topic
+	  const data = {
+		forumname: req.body.forumname,
+		forumdesc: req.body.forumdesc,
+		share: req.body.share,
+		topic: req.body.topic,
+		admin: req.userData.username // Use userId from authenticated user
+	  };
+	  const query1 = "INSERT INTO forumtb (forumname, forumdesc, share, topic, admin) VALUES (?, ?, ?, ?, ?)";
+	  pool.query(query1, Object.values(data), (error) => {
+		if (error) {
+		  res.status(400);
+		  res.json({ status: "Error", message: "Please fill correctly!" });
+		} else {
+		  res.status(201);
+		  res.json({ status: "Success", message: "Forum Created!", data: data });
 		}
-		const query1 = "INSERT INTO forumtb (forumname, forumdesc, share, id_topic) VALUES (?, ?, ?, ?)";
-		pool.query(query1, Object.values(data), (error)=>{
-				if (error){
-                    			res.status(400);
-					res.json({status: "Error", message : "Please fill correctly!"});
-				} else {
-                    			res.status(201);
-					res.json({status: "Success", message : "Forum Created!", data:data});
-				}
-		});
-  } catch {
-        res.status(500);
-	res.json({ status: "Error"});  
-    }
+	  });
+	} catch {
+	  res.status(500);
+	  res.json({ status: "Error" });
+	}
 });
 
 //GET ALL DATA FORUM
@@ -330,27 +280,86 @@ router.get("/forum", async (req, res)=>{
 	});
 });
 
-//GET FORUM DATA BY ID
-router.get("/forum/:id_forum", async (req, res)=>{
-	const query = "SELECT * FROM forumtb WHERE id_forum= ?";
-	pool.query(query, [req.params.id_forum], (error, result)=>{
+//GET FORUM DATA BY NAME
+router.get("/forum/:forumname", async (req, res)=>{
+	const query = "SELECT * FROM forumtb WHERE forumname= ?";
+	pool.query(query, [req.params.forumname], (error, result)=>{
 		if (!result[0]) {
             		res.status(404);
-			res.json({status: "Error", message: "ID Not found!"});
+			res.json({status: "Error", message: "Forum Not found!"});
 		} else {
 			res.json({status: "Success", message : "registered forums", data: result[0]});
 		} 
 	});
+});  
+
+// POST JOIN FORUM
+router.post("/forum/join/:forumname", authenticateUser, async (req, res) => {
+	try {
+	  const forumname = req.params.forumname;
+	  const username = req.userData.username; // Use userId from authenticated user
+  
+	  // Check if the user is already a member of the forum
+	  const query = "SELECT * FROM userforum WHERE forumname = ? AND username = ?";
+	  pool.query(query, [forumname, username], (error, result) => {
+		if (error) {
+		  res.status(500);
+		  res.json({ status: "Error" });
+		} else {
+		  if (result.length > 0) {
+			res.status(409);
+			res.json({ status: "Error", message: "User is already a member of the forum" });
+		  } else {
+			// Add the user as a member of the forum
+			const insertQuery = "INSERT INTO userforum (forumname, username) VALUES (?, ?)";
+			pool.query(insertQuery, [forumname, username], (error) => {
+			  if (error) {
+				res.status(400);
+				res.json({ status: "Error", message: "Failed to join the forum" });
+			  } else {
+				res.status(201);
+				res.json({ status: "Success", message: "User joined the forum" });
+			  }
+			});
+		  }
+		}
+	  });
+	} catch {
+	  res.status(500);
+	  res.json({ status: "Error" });
+	}
 });
 
+// GET list members of a forum
+router.get("/forums/members/:forumname", async (req, res) => {
+	try {
+	  const forumname = req.params.forumname;
+  
+	  const query = "SELECT username FROM userforum WHERE forumname = ?";
+	  pool.query(query, [forumname], (error, results) => {
+		if (error) {
+		  res.status(400).json({ status: "Error", message: "Failed to retrieve members" });
+		} else {
+		  const members = results.map(row => row.username);
+  
+		  res.status(200).json({ status: "Success", members: members });
+		}
+	  });
+	} catch {
+	  res.status(500).json({ status: "Error" });
+	}
+});
+  
+
 //POST CHAT TO DB
-router.post("/forum/:id_forum/chat", async (req, res)=>{
+router.post("/forum/chat/:forumname", authenticateUser, async (req, res)=>{
 	try {
 		const data = {
-			text: req.query.text,
-			id_forum: req.params.id_forum,
+			text: req.body.text,
+			forumname: req.params.forumname,
+			sender: req.userData.username,
 		}
-		const query1 = "INSERT INTO chattb (text, id_forum) VALUES (?, ?)";
+		const query1 = "INSERT INTO chattb (text, forumname, sender) VALUES (?, ?, ?)";
 		pool.query(query1, Object.values(data), (error)=>{
 				if (error){
                     			res.status(400);
@@ -367,24 +376,27 @@ router.post("/forum/:id_forum/chat", async (req, res)=>{
 });
 
 //GET CHAT FROM GROUP
-router.get("/forum/:id_forum/chat", async (req, res) => {
-	const idForum = req.params.id_forum;
-	const query = "SELECT text FROM chattb WHERE id_forum = ?";
-	const values = [idForum];
+router.get("/forum/chat/:forumname", async (req, res) => {
+	const forumname = req.params.forumname;
+	const query = "SELECT text, sender FROM chattb WHERE forumname = ?";
+	const values = [forumname];
   
 	pool.query(query, values, (error, result) => {
 	  if (error) {
 		console.error('Error fetching chat messages:', error);
 		res.status(500).json({ error: 'Failed to fetch chat messages' });
 	  } else {
-		const messages = result.map((row) => row.text);
+		const messages = result.map((row) => ({
+			text: row.text,
+			sender: row.sender
+		  }));
 		res.status(200).json({ status: 'Success', message: 'Chat', data: messages });
 	  }
 	});
 });  
 
 //DELETE USER DATA FROM DB
-router.delete("/users/:id", [auth, admin], async (req, res)=>{
+router.delete("/users/:id", async (req, res)=>{
 	const id = req.params.id
 	const query1 = `SELECT * FROM usertb WHERE id= ${id}`;
 	const query = `DELETE FROM usertb WHERE id= ${id}`;

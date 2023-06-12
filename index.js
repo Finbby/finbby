@@ -8,13 +8,11 @@ const io = require('socket.io')(http);
 app.use(express.json());
 
 // Import routes
-const authRouter = require("./routes/auth");
 const handlerRouter = require("./routes/handler");
 const pool = require("./sql");
 
 // Setup all the routes
 app.use("/api/handler", handlerRouter);
-app.use("/api/auth", authRouter);
 
 const port = process.env.port || 3000;
 app.listen(port, ()=>{
