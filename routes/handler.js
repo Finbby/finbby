@@ -33,46 +33,65 @@ router.post("/register", async (req, res)=>{
     }
 });  
 
-//VALIDATE LOGIN
+// Store the token in a variable in your backend server
+let storedToken;
+
+// VALIDATE LOGIN
 router.post("/login", async (req, res) => {
-    const email = req.query.email
-    const password = req.query.password
-    if (email == null || email == '' || password == ''|| password == null){
-        res.status(400);
-        return res.json({ status: "Error", message: "Please input email and password!"});
-    } 
-        const query1 = `SELECT * FROM usertb WHERE email = '${email}'`;
-    try {
-        pool.query(query1, async(error, result)=>{
-        if (!result[0]) {  
-			res.status(404);
-			return res.json({status: "Error", message: "User Not found!"});
-		}
-		if(await bcrypt.compare(password , result[0].password)) {
-			const token = jwt.sign({ email: result[0].email, id_user: result[0].id_user, username: result[0].username }, 'capstone', { expiresIn: '20h' });
-        	res.json({ status: "Success", data: result[0], token: token });
-      		} else {
-        	res.status(401);
-        	res.json({ status: "Error", message: "Incorrect Email or Password!" });
-      	}
-    	});
-  	} catch {
-    	res.status(500);
-    	res.json({ status: "Error" });
+  const email = req.query.email;
+  const password = req.query.password;
+  
+  if (email == null || email == '' || password == '' || password == null) {
+    res.status(400);
+    return res.json({ status: "Error", message: "Please input email and password!" });
+  } 
+
+  const query1 = `SELECT * FROM usertb WHERE email = '${email}'`;
+  
+  try {
+    pool.query(query1, async (error, result) => {
+      if (!result[0]) {  
+        res.status(404);
+        return res.json({ status: "Error", message: "User Not found!" });
+      }
+      
+      if (await bcrypt.compare(password, result[0].password)) {
+        const token = jwt.sign(
+          { email: result[0].email, id_user: result[0].id_user, username: result[0].username },
+          'capstone',
+          { expiresIn: '20h' }
+        );
+
+        // Store the token on the backend
+        storedToken = token;
+
+        res.json({ status: "Success", data: result[0], token: token });
+      } else {
+        res.status(401);
+        res.json({ status: "Error", message: "Incorrect Email or Password!" });
+      }
+    });
+  } catch {
+    res.status(500);
+    res.json({ status: "Error" });
   }
 });
+
 const authenticateUser = (req, res, next) => {
-	try {
-	  const token = req.headers.authorization.split(" ")[1]; // Extract the token from the Authorization header
-	  const secretKey = 'capstone'; // Replace 'your_secret_key' with your actual secret key
-	  const decodedToken = jwt.verify(token, secretKey); // Verify the token
-  
-	  req.userData = { email: decodedToken.email, id_user: decodedToken.id_user, username: decodedToken.username }; // Attach the user data to the request object
-	  next(); // Call the next middleware
-	} catch (error) {
-	  res.status(401).json({ status: "Error", message: "Authentication failed" });
-	}
-  };
+  try {
+    if (!storedToken) {
+      throw new Error('Token not found');
+    }
+
+    const secretKey = 'capstone';
+    const decodedToken = jwt.verify(storedToken, secretKey);
+    req.userData = { email: decodedToken.email, id_user: decodedToken.id_user, username: decodedToken.username };
+    next();
+  } catch (error) {
+    res.status(401).json({ status: "Error", message: "Authentication failed" });
+  }
+};
+
 
 //VALIDATE EMAIL
 router.post("/email", async (req, res) => {
@@ -151,7 +170,7 @@ router.put("/users/changePassword", async (req, res)=>{
 });
 
 //POST datarecommendation TO DB
-router.post("/survey", async (req, res)=>{
+router.post("/survey", authenticateUser, async (req, res)=>{
 	try {
 		const data = {
 			topic: req.query.topic,
@@ -272,13 +291,41 @@ router.post("/forum/create", authenticateUser, async (req, res) => {
 	}
 });
 
-//GET ALL DATA FORUM
-router.get("/forum", async (req, res)=>{
+// GET all forums with members
+router.get("/forum", async (req, res) => {
 	const query = "SELECT * FROM forumtb";
- 	pool.query(query, (error, result)=>{
-		res.json({status: "Success", message : "All Forums", data: result });
+	
+	pool.query(query, (error, forumsResult) => {
+	  if (error) {
+		res.status(500).json({ status: "Error", message: "Failed to retrieve forum data" });
+	  } else {
+		const forumList = forumsResult;
+  
+		const memberQuery = "SELECT username FROM userforum WHERE forumname = ?";
+		const getMembers = (forumIndex) => {
+		  if (forumIndex >= forumList.length) {
+			res.status(200).json({ status: "Success", message: "All Forums with Members", data: forumList });
+			return;
+		  }
+  
+		  const forumname = forumList[forumIndex].forumname;
+  
+		  pool.query(memberQuery, [forumname], (error, membersResult) => {
+			if (error) {
+			  res.status(500).json({ status: "Error", message: "Failed to retrieve members" });
+			} else {
+			  const members = membersResult.map(row => row.username);
+			  forumList[forumIndex].members = members;
+  
+			  getMembers(forumIndex + 1);
+			}
+		  });
+		};
+  
+		getMembers(0);
+	  }
 	});
-});
+});  
 
 //GET FORUM DATA BY NAME
 router.get("/forum/:forumname", async (req, res)=>{
@@ -331,24 +378,24 @@ router.post("/forum/join/:forumname", authenticateUser, async (req, res) => {
 });
 
 // GET list members of a forum
-router.get("/forums/members/:forumname", async (req, res) => {
-	try {
-	  const forumname = req.params.forumname;
-  
-	  const query = "SELECT username FROM userforum WHERE forumname = ?";
-	  pool.query(query, [forumname], (error, results) => {
-		if (error) {
-		  res.status(400).json({ status: "Error", message: "Failed to retrieve members" });
-		} else {
-		  const members = results.map(row => row.username);
-  
-		  res.status(200).json({ status: "Success", members: members });
-		}
-	  });
-	} catch {
-	  res.status(500).json({ status: "Error" });
-	}
-});
+// router.get("/forums/members/:forumname", async (req, res) => {
+//	try {
+//	  const forumname = req.params.forumname;
+//  
+//	  const query = "SELECT username FROM userforum WHERE forumname = ?";
+//	  pool.query(query, [forumname], (error, results) => {
+//		if (error) {
+//		  res.status(400).json({ status: "Error", message: "Failed to retrieve members" });
+//		} else {
+//		  const members = results.map(row => row.username);
+  //
+	//	  res.status(200).json({ status: "Success", members: members });
+	//	}
+//	  });
+//	} catch {
+//	  res.status(500).json({ status: "Error" });
+//	}
+// });
   
 
 //POST CHAT TO DB
