@@ -5,19 +5,26 @@ const pool = require("../sql");
 const upload = require('../middleware/uploadMiddleware');
 
 const router = express.Router();
+const Multer = require('multer')
+const imgUpload = require('../modules/imgUpload')
+
+const multer = Multer({
+    storage: Multer.MemoryStorage,
+    fileSize: 5 * 1024 * 1024
+})
 
 //POST REGISTER DATA TO DB
 router.post("/register", async (req, res)=>{
 	try {
 		const hashedPassword = await bcrypt.hash(req.body.password, 10)
-		const created_at = new Date().toISOString();
+		// const created_at = new Date().toISOString();
 		const data = {
 			email: req.body.email,
 			username: req.body.username,
 			password: hashedPassword,
-			created_at: created_at
+			// created_at: created_at
 		}
-		const query1 = "INSERT INTO usertb ( email, username, password, created_at) VALUES (?, ?, ?, ?)";
+		const query1 = "INSERT INTO userbaru ( email, username, password) VALUES (?, ?, ?)";
 		pool.query(query1, Object.values(data), (error)=>{
 				if (error){
 					res.status(409);
@@ -46,7 +53,7 @@ router.post("/login", async (req, res) => {
     return res.json({ status: "Error", message: "Please input email and password!" });
   } 
 
-  const query1 = `SELECT * FROM usertb WHERE email = '${email}'`;
+  const query1 = `SELECT * FROM userbaru WHERE email = '${email}'`;
   
   try {
     pool.query(query1, async (error, result) => {
@@ -58,7 +65,7 @@ router.post("/login", async (req, res) => {
       if (await bcrypt.compare(password, result[0].password)) {
         const token = jwt.sign(
           { email: result[0].email, id_user: result[0].id_user, username: result[0].username },
-          'capstone',
+          'secret_key',
           { expiresIn: '20h' }
         );
 
@@ -83,7 +90,7 @@ const authenticateUser = (req, res, next) => {
       throw new Error('Token not found');
     }
 
-    const secretKey = 'capstone';
+    const secretKey = 'finby_secret_key';
     const decodedToken = jwt.verify(storedToken, secretKey);
     req.userData = { email: decodedToken.email, id_user: decodedToken.id_user, username: decodedToken.username };
     next();
@@ -100,7 +107,7 @@ router.post("/email", async (req, res) => {
         res.status(400);
 		return res.json({ status: "Error", message: "Please input email!"});
 	} 
-	const query1 = `SELECT * FROM usertb WHERE email = '${email}'`;
+	const query1 = `SELECT * FROM userbaru WHERE email = '${email}'`;
 	try {
 			pool.query(query1, async(error, result)=>{
 				if (!result[0]) {  
@@ -117,8 +124,8 @@ router.post("/email", async (req, res) => {
 });
 
 //GET ALL DATA USER
-router.get("/users", async (req, res)=>{
-	const query = "SELECT * FROM usertb";
+router.get("/users", authenticateUser, async (req, res)=>{
+	const query = "SELECT * FROM userbaru";
  	pool.query(query, (error, result)=>{
 		res.json(result); 
 	});
@@ -127,7 +134,7 @@ router.get("/users", async (req, res)=>{
 //GET USER DATA BY EMAIL
 router.get("/users/email", async (req, res)=>{
 	const email = req.body.email
-	const query = `SELECT * FROM usertb WHERE email = '${email}'`;
+	const query = `SELECT * FROM userbaru WHERE email = '${email}'`;
 	pool.query(query, [req.params.email], (error, result)=>{
 		if (!result[0]) {
             		res.status(404);
@@ -152,8 +159,8 @@ router.put("/users/changePassword", async (req, res)=>{
 		password: password,
 		updated_at: updated_at,
 	}
-	const query1 = `UPDATE usertb SET password ='${password}', updated_at='${updated_at}' WHERE email = '${email}'`;
-	const query2 = `SELECT * FROM usertb WHERE email = '${email}'`;
+	const query1 = `UPDATE userbaru SET password ='${password}', updated_at='${updated_at}' WHERE email = '${email}'`;
+	const query2 = `SELECT * FROM userbaru WHERE email = '${email}'`;
 	try {
 		pool.query(query2, (error, result)=>{
 			if (!result[0]) {  
@@ -214,39 +221,59 @@ router.get("/survey/:id", async (req, res)=>{
 
 //POST CONTENT TO DB
 router.post("/posting/create", authenticateUser, async (req, res)=>{
-  upload.single('image')(req, res, (err) => {
-    if (err) {
-      res.status(400).json({ status: 'Error', message: 'Failed to upload file' });
-    } else {
-      try {
-        const data = {
-          title: req.body.title,
-          description: req.body.description,
-          topic: req.body.topic,
-          content: req.body.content,
-          image: req.file ? req.file.filename : null,
-          sender: req.userData.username,
-        };
-
-        const query =
-          'INSERT INTO postingtb (title, description, topic, content, image, sender) VALUES (?, ?, ?, ?, ?, ?)';
-        pool.query(query, Object.values(data), (error) => {
-          if (error) {
-            res.status(400).json({ status: 'Error', message: 'Please fill correctly!' });
-          } else {
-            res.status(201).json({ status: 'Success', message: 'Content Created!', data: data });
-          }
-        });
-      } catch {
-        res.status(500).json({ status: 'Error' });
-      }
-    }
-  });
+	upload.single('image')(req, res, (err) => {
+	  if (err) {
+		res.status(400).json({ status: 'Error', message: 'Failed to upload file' });
+	  } else {
+		try {
+		  const data = {
+			title: req.body.title,
+			description: req.body.description,
+			topic: req.body.topic,
+			content: req.body.content,
+			image: req.file ? req.file.filename : null,
+			sender: req.userData.username,
+		  };
+  
+		  const query =
+			'INSERT INTO postingtb (title, description, topic, content, image, sender) VALUES (?, ?, ?, ?, ?, ?)';
+		  pool.query(query, Object.values(data), (error) => {
+			if (error) {
+			  res.status(400).json({ status: 'Error', message: 'Please fill correctly!' });
+			} else {
+			  res.status(201).json({ status: 'Success', message: 'Content Created!', data: data });
+			}
+		  });
+		} catch {
+		  res.status(500).json({ status: 'Error' });
+		}
+	  }
+	});
 });
+
+router.post("/posting/creates", authenticateUser, multer.single('attachment'), imgUpload.uploadToGcs, (req, res) => {
+    const data = {
+		title: req.body.title,
+		description: req.body.description,
+		topic: req.body.topic,
+		content: req.body.content,
+		sender: req.userData.username,
+		attachment: req.file ? req.file.cloudStoragePublicUrl : null,
+	  };
+
+	  const query = 'INSERT INTO tespost (title, description, topic, content, sender, attachment) VALUES (?, ?, ?, ?, ?, ?)';
+	  pool.query(query, Object.values(data), (err, rows, fields) => {
+		if (err) {
+		  res.status(500).send({ message: err.sqlMessage });
+		} else {
+		  res.send({ message: "Insert Successful" });
+		}
+	  });
+	});
 
 //GET ALL POSTING CONTENT 
 router.get("/posting", async (req, res)=>{
-	const query = "SELECT * FROM postingtb";
+	const query = "SELECT * FROM tespost";
  	pool.query(query, (error, result)=>{
 		res.json({status: "Success", message : "All Contents", data: result }); 
 	});
@@ -254,7 +281,7 @@ router.get("/posting", async (req, res)=>{
 
 //GET POSTING DATA BY ID
 router.get("/posting/:id", async (req, res)=>{
-	const query = "SELECT * FROM postingtb WHERE id_posting= ?";
+	const query = "SELECT * FROM tespost WHERE id_post= ?";
 	pool.query(query, [req.params.id], (error, result)=>{
 		if (!result[0]) {
       			res.status(404);
