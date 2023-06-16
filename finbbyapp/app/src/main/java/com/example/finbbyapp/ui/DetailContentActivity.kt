@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import com.bumptech.glide.Glide
 import com.example.finbbyapp.R
 import com.example.finbbyapp.databinding.ActivityDetailContentBinding
 
@@ -18,6 +19,18 @@ class DetailContentActivity : AppCompatActivity() {
 
         getSupportActionBar()?.title = ""
         getSupportActionBar()?.setDisplayHomeAsUpEnabled(true)
+
+        val title = intent.getStringExtra("title_detail")
+        val sender = intent.getStringExtra("sender_detail")
+        val deskripsi = intent.getStringExtra("deskripsi_detail")
+        val photo = intent.getStringExtra("photo_detail")
+
+        binding.title.text = title
+        binding.author.text = sender
+        binding.deskripsi.text = deskripsi
+        Glide.with(this)
+            .load(photo)
+            .into(binding.imageView)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

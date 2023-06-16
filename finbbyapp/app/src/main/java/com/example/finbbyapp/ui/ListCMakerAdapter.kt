@@ -10,11 +10,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
-class ListCMakerAdapter(val listContent: ArrayList<DetailContent>) : RecyclerView.Adapter<ListCMakerAdapter.ListViewHolder>() {
+class ListCMakerAdapter(val listContent: List<DetailContent>) : RecyclerView.Adapter<ListCMakerAdapter.ListViewHolder>() {
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.title_content)
         val deskripsi: TextView = itemView.findViewById(R.id.deskripsi_content)
+        val imgPhoto: ImageView = itemView.findViewById(R.id.banner_content)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
@@ -23,19 +25,20 @@ class ListCMakerAdapter(val listContent: ArrayList<DetailContent>) : RecyclerVie
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
-        val (title, deskripsi, photo) = listContent[position]
+        val (title, deskripsi, name, photo) = listContent[position]
+        Glide.with(holder.itemView.context)
+            .load(listContent[position].photo)
+            .into(holder.imgPhoto)
         holder.title.text = title
         holder.deskripsi.text = deskripsi
 
         holder.itemView.setOnClickListener {
             val intentDetail = Intent(holder.itemView.context, DetailContentActivity::class.java)
-//            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
+            intentDetail.putExtra("title_detail", title)
+            intentDetail.putExtra("sender_detail", name)
+            intentDetail.putExtra("deskripsi_detail", deskripsi)
+            intentDetail.putExtra("photo_detail", photo)
             holder.itemView.context.startActivity(intentDetail)
-        }
-
-        holder.title.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("myapp://chat"))
-            holder.itemView.context.startActivity(intent)
         }
     }
 

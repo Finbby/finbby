@@ -3,34 +3,47 @@ package com.example.finbbyapp.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.finbbyapp.MainActivity
 import com.example.finbbyapp.R
 import com.example.finbbyapp.databinding.FragmentAddContent1Binding
 import com.example.finbbyapp.databinding.FragmentHomeBinding
+import com.example.finbbyapp.network.ApiConfig
+import com.example.finbbyapp.network.response.LoginResponse
+import com.example.finbbyapp.network.response.RegisterResponse
+import com.example.finbbyapp.ui.preferences.AddContent1Model
+import com.example.finbbyapp.ui.preferences.SurveyPreference
+import com.example.finbbyapp.ui.preferences.UserPreference
+import com.google.gson.Gson
+import retrofit2.Callback
+import retrofit2.Response
 
 class AddContent1Fragment : Fragment() {
     private lateinit var rvQSurvey: RecyclerView
     private var _binding: FragmentAddContent1Binding? = null
     private val binding get() = _binding!!
-    private lateinit var listContentAdapter: ListQSurveyAdapter
+    private lateinit var userPreference: UserPreference
+    private lateinit var addContent1Model: AddContent1Model
+    private lateinit var listContentAdapter: AddContent1Adapter
     val listQSurvey = arrayListOf(
         DetailQSurvey("Sport"),
         DetailQSurvey("Book"),
         DetailQSurvey("Movie"),
-        DetailQSurvey(""),
-        DetailQSurvey(""),
-        DetailQSurvey(""),
-        DetailQSurvey(""),
-        DetailQSurvey(""),
+        DetailQSurvey("Music"),
+        DetailQSurvey("Food"),
+        DetailQSurvey("Traveling"),
+        DetailQSurvey("Gamer"),
         DetailQSurvey(""),
         DetailQSurvey(""),
         DetailQSurvey(""),)
@@ -43,8 +56,10 @@ class AddContent1Fragment : Fragment() {
         val root: View = binding.root
         val activity = requireActivity() as AppCompatActivity
         activity.supportActionBar?.show()
+        userPreference = UserPreference(requireActivity())
+        addContent1Model = AddContent1Model()
         rvQSurvey = binding.rvTopics
-        listContentAdapter = ListQSurveyAdapter(listQSurvey)
+        listContentAdapter = AddContent1Adapter(listQSurvey, requireActivity())
         rvQSurvey.layoutManager = GridLayoutManager(requireActivity(), 3)
 
         setHasOptionsMenu(true)
@@ -73,23 +88,26 @@ class AddContent1Fragment : Fragment() {
         //showRecyclerList()
 
         binding.next.setOnClickListener {
-            val intent = Intent(requireActivity(), AddContent2Activity::class.java)
-            startActivity(intent)
+            val title = binding.title.text.toString().trim()
+            val content = binding.content.text.toString().trim()
+
+            when {
+                title.isEmpty() -> {
+                    Toast.makeText(requireActivity(), "Terdapat inputan yg masih kosong", Toast.LENGTH_SHORT).show()
+                }
+                content.isEmpty() ->  {
+                    Toast.makeText(requireActivity(), "Terdapat inputan yg masih kosong", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    addContent1Model.title = title
+                    addContent1Model.content = content
+                    addContent1Model.topic = userPreference.getTopic().topic1
+                    val intent = Intent(requireActivity(), AddContent2Activity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
 
         return root
-    }
-
-    private fun showRecyclerList() {
-        val listQSurvey = arrayListOf(DetailQSurvey("Tutor 1"),
-            DetailQSurvey("Tutor 1"),
-            DetailQSurvey("Tutor 1"),
-            DetailQSurvey("Tutor 1"),
-            DetailQSurvey("Tutor 1"),
-            DetailQSurvey("Tutor 1"))
-
-        rvQSurvey.layoutManager = GridLayoutManager(requireContext(), 3)
-        val listContentAdapter = ListQSurveyAdapter(listQSurvey)
-
     }
 }

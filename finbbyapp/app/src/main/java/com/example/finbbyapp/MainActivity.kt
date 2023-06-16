@@ -19,16 +19,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.finbbyapp.databinding.ActivityMainBinding
 import com.example.finbbyapp.ui.AddContent1Fragment
 import com.example.finbbyapp.ui.JoinForumActivity
+import com.example.finbbyapp.ui.LoginActivity
+import com.example.finbbyapp.ui.preferences.UserModel
+import com.example.finbbyapp.ui.preferences.UserPreference
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var nav: Number = 0
+    private lateinit var userPreference: UserPreference
+    private lateinit var userModel: UserModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        userPreference = UserPreference(this)
+        checkLoginStatus()
 
         val navView: BottomNavigationView = binding.navView
 
@@ -100,6 +108,7 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onQueryTextSubmit(query: String): Boolean {
                     val intent = Intent(this@MainActivity, JoinForumActivity::class.java)
+                    intent.putExtra("nama_forum", query)
                     startActivity(intent)
 //                mainViewModel.findUser(query)
                     searchView.clearFocus()
@@ -113,6 +122,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    fun checkLoginStatus() {
+        userModel = userPreference.getUser()
+
+        val sesi = userModel.name
+
+        if(sesi?.isEmpty() as Boolean) {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
 }

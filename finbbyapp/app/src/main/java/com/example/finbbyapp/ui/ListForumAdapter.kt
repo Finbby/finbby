@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finbbyapp.R
 
-class ListForumAdapter(val listForum: ArrayList<DetailForum>) : RecyclerView.Adapter<ListForumAdapter.ListViewHolder>() {
+class ListForumAdapter(val listForum: List<DetailForum>) : RecyclerView.Adapter<ListForumAdapter.ListViewHolder>() {
     class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val photo: ImageView = itemView.findViewById(R.id.img_forum)
         val name: TextView = itemView.findViewById(R.id.name)
@@ -29,7 +29,7 @@ class ListForumAdapter(val listForum: ArrayList<DetailForum>) : RecyclerView.Ada
 
         holder.itemView.setOnClickListener {
             val intentDetail = Intent(holder.itemView.context, ChatActivity::class.java)
-//            intentDetail.putExtra(DetailActivity.KEY_HERO, listHero[holder.adapterPosition])
+            intentDetail.putExtra("db", name)
             holder.itemView.context.startActivity(intentDetail)
         }
 

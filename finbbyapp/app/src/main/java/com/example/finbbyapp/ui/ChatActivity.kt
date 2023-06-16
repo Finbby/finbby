@@ -1,5 +1,6 @@
 package com.example.finbbyapp.ui
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finbbyapp.R
 import com.example.finbbyapp.databinding.ActivityChatBinding
+import com.example.finbbyapp.ui.preferences.UserPreference
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
@@ -20,6 +22,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var rvChat: RecyclerView
     private lateinit var db: FirebaseDatabase
     private lateinit var adapter: FirebaseMessageAdapter
+    private lateinit var userPreference: UserPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,18 +30,30 @@ class ChatActivity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.show()
 
-        supportActionBar?.title = "Forum Name"
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        userPreference = UserPreference(this)
 
         db = Firebase.database
 
-        val messagesRef = db.reference.child(MESSAGES_CHILD)
+        val namaDb = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getStringExtra("db")
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getStringExtra("db")
+        }
+
+        supportActionBar?.title = namaDb
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
+        val messagesRef = db.reference.child(namaDb as String)
+
+
 
         binding.sendButton.setOnClickListener {
             val friendlyMessage = DataMessage(
-                "user123",
+                userPreference.getUser().name,
                 binding.edtChat.text.toString().trim(),
-                "https://wallpapercave.com/wp/wp3024281.jpg",
+                "https://img.freepik.com/vector-premium/personaje-avatar-moda-icono-hombres-ilustracion-vector-plano-gente-alegre-feliz-marco-redondo-retratos-masculinos-grupo-equipo-adorables-chicos-aislados-sobre-fondo-blanco_275421-286.jpg?w=500",
                 Date().time
             )
             messagesRef.push().setValue(friendlyMessage) { error, _ ->
@@ -57,7 +72,7 @@ class ChatActivity : AppCompatActivity() {
         val options = FirebaseRecyclerOptions.Builder<DataMessage>()
             .setQuery(messagesRef, DataMessage::class.java)
             .build()
-        adapter = FirebaseMessageAdapter(options)
+        adapter = FirebaseMessageAdapter(options, userPreference.getUser().name)
         binding.rvChat.adapter = adapter
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -80,19 +95,6 @@ class ChatActivity : AppCompatActivity() {
 
         return super.onOptionsItemSelected(item)
     }
-
-//    private fun showRecyclerList() {
-//        val listChat = arrayListOf(DataMessage("Andi", "Selamat siang, selmat malam", R.drawable.img_login, "15 April 2023"),
-//            DataMessage("Andi", "Selamat siang, selmat malam", R.drawable.img_login, "15 April 2023"),
-//                    DataMessage("Andi", "Selamat skj hnjnkj kjnbiang, senn hhhh hhh  hhh hlmat malam", R.drawable.img_login, "15 April 2023"),
-//            DataMessage("Andi", "Selamat siang, snkjnj hjuh huuhu hguhuhu huhuhyuhuh u kjnkjnihelmat malam", R.drawable.img_login, "15 April 2023"),
-//            DataMessage("Andi", "Selamat sianij  nhkjnk g, selmat malam", R.drawable.img_login, "15 April 2023"),
-//            DataMessage("Andi", "Selamat siang, selmat malam", R.drawable.img_login, "15 April 2023"))
-//
-//        rvChat.layoutManager = LinearLayoutManager(this)
-//        val listChatAdapter = ListChatAdapter(listChat)
-//        rvChat.adapter = listChatAdapter
-//    }
 
     public override fun onResume() {
         super.onResume()

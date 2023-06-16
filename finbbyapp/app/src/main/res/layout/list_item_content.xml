@@ -36,7 +36,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="5.5dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img_login"
+                android:src="@drawable/profil"
                 card_view:layout_constraintBottom_toBottomOf="parent"
                 card_view:layout_constraintStart_toStartOf="parent"
                 card_view:layout_constraintTop_toTopOf="@+id/title_content"

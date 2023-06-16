@@ -12,7 +12,8 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
 
 class FirebaseMessageAdapter(
-    options: FirebaseRecyclerOptions<DataMessage>
+    options: FirebaseRecyclerOptions<DataMessage>,
+    private val currentUserName: String?
 ) : FirebaseRecyclerAdapter<DataMessage, FirebaseMessageAdapter.MessageViewHolder>(options) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -34,7 +35,7 @@ class FirebaseMessageAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: DataMessage, position: Int) {
             binding.message.text = item.message
-           setPosition(this, position, item.message as String)
+           setPosition(this, position, item.message as String, item.name as String)
             binding.name.text = item.name
             Glide.with(itemView.context)
                 .load(item.photo)
@@ -44,10 +45,10 @@ class FirebaseMessageAdapter(
                 binding.date.text = DateUtils.getRelativeTimeSpanString(item.timestamp)
             }
         }
-        private fun setPosition(holder: MessageViewHolder, position: Int, message: String) {
+        private fun setPosition(holder: MessageViewHolder, position: Int, message: String, name: String) {
             val layoutParams = holder.itemView.layoutParams as RecyclerView.LayoutParams
 
-        if (position % 2 == 0) {
+        if (currentUserName != name) {
             // Item dengan posisi genap (mulai dari 0) ditempatkan di sebelah kiri.
             layoutParams.setMargins(8, 25, 96, 0)
         } else {

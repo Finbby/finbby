@@ -13,9 +13,9 @@
         android:layout_marginStart="25dp"
         android:layout_marginTop="8dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/img_login"
+        android:src="@drawable/group"
         app:civ_border_color="#F08A61"
-        app:civ_border_width="1.7dp"
+        app:civ_border_width="2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
